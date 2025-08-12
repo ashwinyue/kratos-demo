@@ -9,6 +9,7 @@ message Bootstrap {
   Server server = 1;
   Data data = 2;
   Telemetry telemetry = 3;
+  Cron cron = 4;
 }
 
 message Server {
@@ -37,8 +38,22 @@ message Data {
     google.protobuf.Duration read_timeout = 3;
     google.protobuf.Duration write_timeout = 4;
   }
+  message MongoDB {
+    string uri = 1;
+    string database = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message RocketMQ {
+    repeated string name_servers = 1;
+    string group_name = 2;
+    string access_key = 3;
+    string secret_key = 4;
+    string namespace = 5;
+  }
   Database database = 1;
   Redis redis = 2;
+  MongoDB mongodb = 3;
+  RocketMQ rocketmq = 4;
 }
 
 message Telemetry {
@@ -53,4 +68,9 @@ message Telemetry {
   }
   Tracing tracing = 1;
   Metrics metrics = 2;
+}
+
+message Cron {
+  bool enabled = 1;
+  string timezone = 2;
 }

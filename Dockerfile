@@ -1,9 +1,10 @@
-FROM golang:1.19 AS builder
+FROM golang:1.23 AS builder
 
 COPY . /src
 WORKDIR /src
 
-RUN GOPROXY=https://goproxy.cn make build
+RUN GOPROXY=https://goproxy.cn go mod download
+RUN CGO_ENABLED=0 GOOS=linux go build -o bin/kratos-demo ./cmd/kratos-demo
 
 FROM debian:stable-slim
 
@@ -19,6 +20,7 @@ WORKDIR /app
 
 EXPOSE 8000
 EXPOSE 9000
+EXPOSE 9090
 VOLUME /data/conf
 
-CMD ["./server", "-conf", "/data/conf"]
+CMD ["./kratos-demo", "-conf", "/data/conf"]

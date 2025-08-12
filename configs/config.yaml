@@ -14,6 +14,17 @@ data:
     addr: 127.0.0.1:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
+  mongodb:
+    uri: mongodb://127.0.0.1:27017
+    database: kratos_demo
+    timeout: 10s
+  rocketmq:
+    name_servers:
+      - 127.0.0.1:9876
+    group_name: kratos_demo_group
+    access_key: ""
+    secret_key: ""
+    namespace: ""
 telemetry:
   tracing:
     endpoint: http://localhost:14268/api/traces
@@ -22,3 +33,6 @@ telemetry:
   metrics:
     addr: 0.0.0.0:9090
     path: /metrics
+cron:
+  enabled: true
+  timezone: Asia/Shanghai

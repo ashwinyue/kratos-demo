@@ -24,7 +24,19 @@ import (
 
 // wireApp init kratos application.
 func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData, logger)
+	database, err := data.NewMongoDB(confData, logger)
+	if err != nil {
+		return nil, nil, err
+	}
+	producer, err := data.NewRocketMQProducer(confData, logger)
+	if err != nil {
+		return nil, nil, err
+	}
+	pushConsumer, err := data.NewRocketMQConsumer(confData, logger)
+	if err != nil {
+		return nil, nil, err
+	}
+	dataData, cleanup, err := data.NewData(confData, logger, database, producer, pushConsumer)
 	if err != nil {
 		return nil, nil, err
 	}

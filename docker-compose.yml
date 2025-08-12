@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: kratos-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: kratos
+      MYSQL_USER: kratos
+      MYSQL_PASSWORD: kratos
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: kratos-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: kratos-jaeger
+    ports:
+      - "16687:16686"  # Jaeger UI (避免与k8s端口冲突)
+      - "14268:14268"  # HTTP collector
+      - "6831:6831/udp"  # UDP agent
+      - "6832:6832/udp"  # UDP agent
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: kratos-prometheus
+    ports:
+      - "9091:9090"  # 避免与应用的9090端口冲突
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: kratos-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7.0
+    container_name: kratos-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: kratos_demo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    restart: unless-stopped
+
+  rocketmq-namesrv:
+    image: foxiswho/rocketmq:4.8.0
+    container_name: kratos-rocketmq-namesrv
+    ports:
+      - "9876:9876"
+    volumes:
+      - rocketmq_namesrv_logs:/opt/logs
+      - rocketmq_namesrv_store:/opt/store
+    environment:
+      JAVA_OPT: "-Duser.home=/opt -Xms512M -Xmx512M -Xmn128m"
+    command: ["sh", "mqnamesrv"]
+    restart: unless-stopped
+
+  rocketmq-broker:
+    image: foxiswho/rocketmq:4.8.0
+    container_name: kratos-rocketmq-broker
+    ports:
+      - "10909:10909"
+      - "10911:10911"
+    volumes:
+      - rocketmq_broker_logs:/opt/logs
+      - rocketmq_broker_store:/opt/store
+    environment:
+      NAMESRV_ADDR: "rocketmq-namesrv:9876"
+      JAVA_OPT: "-Duser.home=/opt -Xms512M -Xmx512M -Xmn128m"
+    command: ["sh", "mqbroker", "-n", "rocketmq-namesrv:9876", "-c", "/opt/rocketmq-4.8.0/conf/broker.conf"]
+    depends_on:
+      - rocketmq-namesrv
+    restart: unless-stopped
+
+  rocketmq-console:
+    image: styletang/rocketmq-console-ng:latest
+    container_name: kratos-rocketmq-console
+    ports:
+      - "8080:8080"
+    environment:
+      JAVA_OPTS: "-Drocketmq.namesrv.addr=rocketmq-namesrv:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false"
+    depends_on:
+      - rocketmq-namesrv
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  mongodb_data:
+  mongodb_config:
+  rocketmq_namesrv_logs:
+  rocketmq_namesrv_store:
+  rocketmq_broker_logs:
+  rocketmq_broker_store:
+
+networks:
+  default:
+    name: kratos-network

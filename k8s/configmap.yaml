@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kratos-demo-config
+  namespace: default
+data:
+  config.yaml: |
+    server:
+      http:
+        addr: 0.0.0.0:8000
+        timeout: 1s
+      grpc:
+        addr: 0.0.0.0:9000
+        timeout: 1s
+    data:
+      database:
+        driver: mysql
+        source: root:123456@tcp(mysql:3306)/kratos_demo?charset=utf8mb4&parseTime=True&loc=Local
+      redis:
+        addr: redis:6379
+        password: ""
+        db: 0
+        dial_timeout: 1s
+        read_timeout: 0.2s
+        write_timeout: 0.2s
+    telemetry:
+      tracing:
+        endpoint: http://jaeger:14268/api/traces
+      metrics:
+        addr: 0.0.0.0:9090
+        path: /metrics

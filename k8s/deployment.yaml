@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kratos-demo
+  namespace: default
+  labels:
+    app: kratos-demo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kratos-demo
+  template:
+    metadata:
+      labels:
+        app: kratos-demo
+    spec:
+      containers:
+      - name: kratos-demo
+        image: kratos-demo:latest
+        imagePullPolicy: Never  # 使用本地镜像
+        ports:
+        - containerPort: 8000
+          name: http
+        - containerPort: 9000
+          name: grpc
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: KRATOS_CONFIG_PATH
+          value: "/data/conf"
+        volumeMounts:
+        - name: config
+          mountPath: /data/conf
+        livenessProbe:
+          httpGet:
+            path: /helloworld/health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /helloworld/health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: config
+        configMap:
+          name: kratos-demo-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kratos-demo-http
+  namespace: default
+  labels:
+    app: kratos-demo
+spec:
+  type: NodePort
+  ports:
+  - port: 8000
+    targetPort: 8000
+    nodePort: 30080
+    name: http
+  selector:
+    app: kratos-demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kratos-demo-grpc
+  namespace: default
+  labels:
+    app: kratos-demo
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9000
+    targetPort: 9000
+    name: grpc
+  selector:
+    app: kratos-demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kratos-demo-metrics
+  namespace: default
+  labels:
+    app: kratos-demo
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9090
+    targetPort: 9090
+    name: metrics
+  selector:
+    app: kratos-demo

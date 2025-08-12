@@ -11,13 +11,13 @@ import (
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/semconv/v1.4.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
 // NewTracingProvider creates a new OpenTelemetry tracing provider
 func NewTracingProvider(c *conf.Bootstrap, logger log.Logger) (*trace.TracerProvider, error) {
 	helper := log.NewHelper(logger)
-	
+
 	// Create Jaeger exporter
 	exporter, err := jaeger.New(
 		jaeger.WithCollectorEndpoint(
@@ -28,7 +28,7 @@ func NewTracingProvider(c *conf.Bootstrap, logger log.Logger) (*trace.TracerProv
 		helper.Errorf("failed to create jaeger exporter: %v", err)
 		return nil, err
 	}
-	
+
 	// Create resource
 	res, err := resource.New(
 		context.Background(),
@@ -41,7 +41,7 @@ func NewTracingProvider(c *conf.Bootstrap, logger log.Logger) (*trace.TracerProv
 		helper.Errorf("failed to create resource: %v", err)
 		return nil, err
 	}
-	
+
 	// Create tracer provider
 	tp := trace.NewTracerProvider(
 		trace.WithBatcher(exporter,
@@ -51,10 +51,10 @@ func NewTracingProvider(c *conf.Bootstrap, logger log.Logger) (*trace.TracerProv
 		trace.WithResource(res),
 		trace.WithSampler(trace.TraceIDRatioBased(c.Telemetry.Tracing.Sampler)),
 	)
-	
+
 	// Set global tracer provider
 	otel.SetTracerProvider(tp)
-	
+
 	helper.Info("OpenTelemetry tracing initialized")
 	return tp, nil
 }
