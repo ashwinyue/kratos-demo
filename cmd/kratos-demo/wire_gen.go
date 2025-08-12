@@ -28,15 +28,7 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	if err != nil {
 		return nil, nil, err
 	}
-	producer, err := data.NewRocketMQProducer(confData, logger)
-	if err != nil {
-		return nil, nil, err
-	}
-	pushConsumer, err := data.NewRocketMQConsumer(confData, logger)
-	if err != nil {
-		return nil, nil, err
-	}
-	dataData, cleanup, err := data.NewData(confData, logger, database, producer, pushConsumer)
+	dataData, cleanup, err := data.NewData(confData, logger, database)
 	if err != nil {
 		return nil, nil, err
 	}

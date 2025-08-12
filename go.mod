@@ -7,7 +7,10 @@ toolchain go1.24.4
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.2
 	github.com/go-kratos/kratos/v2 v2.8.0
+	github.com/go-redis/redis/v8 v8.11.5
+	github.com/go-resty/resty/v2 v2.16.5
 	github.com/google/wire v0.6.0
+	github.com/looplab/fsm v1.0.3
 	github.com/prometheus/client_golang v1.23.0
 	github.com/redis/go-redis/v9 v9.3.0
 	github.com/robfig/cron/v3 v3.0.1
@@ -55,6 +58,7 @@ require (
 	github.com/prometheus/common v0.65.0 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/sirupsen/logrus v1.4.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tidwall/gjson v1.13.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect

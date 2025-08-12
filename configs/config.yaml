@@ -36,3 +36,36 @@ telemetry:
 cron:
   enabled: true
   timezone: Asia/Shanghai
+sms:
+  providers:
+    aliyun:
+      enabled: true
+      timeout: 30s
+      retry_times: 3
+      max_batch_size: 1000
+      config:
+        access_key_id: "your_aliyun_access_key_id"
+        access_key_secret: "your_aliyun_access_key_secret"
+        sign_name: "your_sign_name"
+        endpoint: "https://dysmsapi.aliyuncs.com"
+    we:
+      enabled: true
+      timeout: 30s
+      retry_times: 3
+      max_batch_size: 500
+      config:
+        api_url: "https://api.we.com"
+        api_key: "your_we_api_key"
+        api_secret: "your_we_api_secret"
+    xsxx:
+      enabled: true
+      timeout: 30s
+      retry_times: 3
+      max_batch_size: 200
+      config:
+        api_url: "https://api.xsxx.com"
+        app_id: "your_xsxx_app_id"
+        app_secret: "your_xsxx_app_secret"
+  default_provider: "aliyun"
+  load_balance_strategy: "round_robin"  # round_robin, random, weighted
+  health_check_interval: 60s

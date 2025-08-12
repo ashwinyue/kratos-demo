@@ -1,7 +1,6 @@
-package data
+package cron
 
 import (
-	"kratos-demo/internal/biz"
 	"kratos-demo/internal/conf"
 	"time"
 
@@ -16,7 +15,7 @@ type cronRepo struct {
 }
 
 // NewCronRepo 创建cron仓储
-func NewCronRepo(c *conf.Bootstrap, logger log.Logger) (biz.TaskRepo, error) {
+func NewCronRepo(c *conf.Bootstrap, logger log.Logger) (TaskRepo, error) {
 	helper := log.NewHelper(logger)
 
 	if !c.Cron.Enabled {
@@ -109,7 +108,7 @@ func (r *cronRepo) IsRunning() bool {
 	if r.cron == nil {
 		return false
 	}
-	
+
 	// cron v3没有直接的IsRunning方法，我们通过检查entries来判断
 	entries := r.cron.Entries()
 	return len(entries) > 0

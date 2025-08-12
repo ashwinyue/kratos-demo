@@ -1,19 +1,19 @@
 package service
 
 import (
-	"kratos-demo/internal/biz"
+	"kratos-demo/internal/cron"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
 
 // TaskService 定时任务服务
 type TaskService struct {
-	cronUc *biz.CronUsecase
+	cronUc *cron.CronUsecase
 	logger log.Logger
 }
 
 // NewTaskService 创建定时任务服务
-func NewTaskService(cronUc *biz.CronUsecase, logger log.Logger) *TaskService {
+func NewTaskService(cronUc *cron.CronUsecase, logger log.Logger) *TaskService {
 	return &TaskService{
 		cronUc: cronUc,
 		logger: logger,

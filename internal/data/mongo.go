@@ -121,7 +121,7 @@ func (r *mongoGreeterRepo) ListByHello(ctx context.Context, hello string) ([]*bi
 	collection := r.data.mongodb.Collection("greeters")
 
 	// 按创建时间倒序排列
-	opts := options.Find().SetSort(bson.D{{"created_at", -1}})
+	opts := options.Find().SetSort(bson.D{{Key: "created_at", Value: -1}})
 	cursor, err := collection.Find(ctx, bson.M{"hello": hello}, opts)
 	if err != nil {
 		helper.Errorf("failed to find greeters by hello: %v", err)
@@ -158,7 +158,7 @@ func (r *mongoGreeterRepo) ListAll(ctx context.Context) ([]*biz.Greeter, error) 
 	collection := r.data.mongodb.Collection("greeters")
 
 	// 按创建时间倒序排列
-	opts := options.Find().SetSort(bson.D{{"created_at", -1}})
+	opts := options.Find().SetSort(bson.D{{Key: "created_at", Value: -1}})
 	cursor, err := collection.Find(ctx, bson.M{}, opts)
 	if err != nil {
 		helper.Errorf("failed to find greeters: %v", err)

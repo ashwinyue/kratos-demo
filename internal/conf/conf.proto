@@ -10,6 +10,7 @@ message Bootstrap {
   Data data = 2;
   Telemetry telemetry = 3;
   Cron cron = 4;
+  Sms sms = 5;
 }
 
 message Server {
@@ -73,4 +74,23 @@ message Telemetry {
 message Cron {
   bool enabled = 1;
   string timezone = 2;
+}
+
+message Sms {
+  message Provider {
+    bool enabled = 1;
+    google.protobuf.Duration timeout = 2;
+    int32 retry_times = 3;
+    int32 max_batch_size = 4;
+    map<string, string> config = 5;
+  }
+  message Providers {
+    Provider aliyun = 1;
+    Provider we = 2;
+    Provider xsxx = 3;
+  }
+  Providers providers = 1;
+  string default_provider = 2;
+  string load_balance_strategy = 3;
+  google.protobuf.Duration health_check_interval = 4;
 }

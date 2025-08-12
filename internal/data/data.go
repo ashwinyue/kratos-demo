@@ -20,19 +20,17 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewGreeterRepo, NewRocketMQProducer, NewRocketMQConsumer, NewMongoDB, NewMessageRepo, NewCronRepo, NewMongoGreeterRepo)
+var ProviderSet = wire.NewSet(NewData, NewGreeterRepo, NewMongoDB, NewMongoGreeterRepo)
 
 // Data .
 type Data struct {
 	db       *gorm.DB
 	rdb      *redis.Client
 	mongodb  *mongo.Database
-	mqProd   rocketmq.Producer
-	mqCons   rocketmq.PushConsumer
 }
 
 // NewData .
-func NewData(c *conf.Data, logger log.Logger, mongodb *mongo.Database, mqProd rocketmq.Producer, mqCons rocketmq.PushConsumer) (*Data, func(), error) {
+func NewData(c *conf.Data, logger log.Logger, mongodb *mongo.Database) (*Data, func(), error) {
 	helper := log.NewHelper(logger)
 
 	// Initialize MySQL
@@ -61,8 +59,6 @@ func NewData(c *conf.Data, logger log.Logger, mongodb *mongo.Database, mqProd ro
 		db:      db,
 		rdb:     rdb,
 		mongodb: mongodb,
-		mqProd:  mqProd,
-		mqCons:  mqCons,
 	}
 
 	cleanup := func() {
@@ -73,12 +69,6 @@ func NewData(c *conf.Data, logger log.Logger, mongodb *mongo.Database, mqProd ro
 		rdb.Close()
 		if mongodb != nil {
 			mongodb.Client().Disconnect(context.Background())
-		}
-		if mqProd != nil {
-			mqProd.Shutdown()
-		}
-		if mqCons != nil {
-			mqCons.Shutdown()
 		}
 	}
 

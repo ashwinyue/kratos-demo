@@ -1,10 +1,14 @@
-package biz
+package cron
 
 import (
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/google/wire"
 )
+
+// ProviderSet is cron providers.
+var ProviderSet = wire.NewSet(NewCronUsecase, NewCronRepo)
 
 // Task 任务实体
 type Task struct {
